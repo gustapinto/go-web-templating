@@ -1,0 +1,13 @@
+{{define "index-view"}}
+
+{{template "header" "Go Templates"}}
+
+<main>
+    <h1>Messages</h1>
+
+    {{template "message-list" .Messages}}
+</main>
+
+{{template "footer"}}
+
+{{end}}
