@@ -1,0 +1,18 @@
+{{define "error-list"}}
+    {{$errors := .}}
+
+    <div>
+        <h1>Errors</h1>
+
+        There was some errors during form or page processing.
+
+        <ul>
+            {{range $error := $errors}}
+            <li>
+                {{$error}}
+            </li>
+            {{end}}
+        </ul>
+    </div>
+
+{{end}}

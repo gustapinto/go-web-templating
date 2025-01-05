@@ -1,13 +1,33 @@
 {{define "index-view"}}
 
-{{template "header" "Go Templates"}}
+    {{template "header" "Messages"}}
 
-<main>
-    <h1>Messages</h1>
+    <main>
+        {{if .Errors}}
+            {{template "error-list" .Errors}}
+        {{end}}
 
-    {{template "message-list" .Messages}}
-</main>
+        <div>
+            <h1>
+                Messages
+            </h1>
 
-{{template "footer"}}
+            {{template "message-list" .Messages}}
+        </div>
+
+        <div>
+            <h2>
+                Write a message
+            </h2>
+
+            <form method="POST">
+                <input type="text" name="message">
+
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </main>
+
+    {{template "footer"}}
 
 {{end}}

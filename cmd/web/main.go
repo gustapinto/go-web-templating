@@ -26,7 +26,8 @@ func main() {
 	mux := http.NewServeMux()
 
 	index := handlers.Index{Views: views}
-	mux.HandleFunc("/", index.Root)
+	mux.HandleFunc("GET /", index.Messages)
+	mux.HandleFunc("POST /", index.MessagesForm)
 
 	listener, err := net.Listen("tcp", ":9000")
 	if err != nil {

@@ -1,8 +1,13 @@
 {{define "message-list"}}
-{{$messages := .}}
-<ul>
-    {{range $message := $messages}}
-        <li>{{$message }}</i>
+    {{$messages := .}}
+
+    {{if not $messages}}
+        No messages to show, try writing one!
+    {{else}}
+        <ul>
+            {{range $message := $messages}}
+                <li>{{$message }}</i>
+            {{end}}
+        </ul>
     {{end}}
-</ul>
 {{end}}
