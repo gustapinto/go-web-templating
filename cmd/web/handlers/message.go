@@ -9,23 +9,31 @@ import (
 	"net/url"
 
 	"github.com/gustapinto/go-web-templating/cmd/web/dto/request"
+	"github.com/gustapinto/go-web-templating/internal/message"
 )
 
-type Index struct {
-	Views    *template.Template
-	messages []string
+type Message struct {
+	Views   *template.Template
+	Service message.Service
+}
+
+func NewMessage(views *template.Template, service message.Service) Message {
+	return Message{
+		Views:   views,
+		Service: service,
+	}
 }
 
 type contextKey string
 
 var errorskey contextKey = "errors"
 
-func (h *Index) Messages(w http.ResponseWriter, r *http.Request) {
+func (h *Message) MessagesListView(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Messages []string
 		Errors   []string
 	}{
-		Messages: h.messages,
+		Messages: h.Service.GetAll(),
 		Errors:   nil,
 	}
 
@@ -43,7 +51,7 @@ func (h *Index) Messages(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Index) MessagesForm(w http.ResponseWriter, r *http.Request) {
+func (h *Message) MessagesForm(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
@@ -61,11 +69,16 @@ func (h *Index) MessagesForm(w http.ResponseWriter, r *http.Request) {
 	if err := req.Validate(); err != nil {
 		ctx := context.WithValue(r.Context(), errorskey, []string{err.Error()})
 		r = r.WithContext(ctx)
-		h.Messages(w, r)
+		h.MessagesListView(w, r)
 		return
 	}
 
-	h.messages = append(h.messages, req.Message)
+	if err := h.Service.Create(req.Message); err != nil {
+		ctx := context.WithValue(r.Context(), errorskey, []string{err.Error()})
+		r = r.WithContext(ctx)
+		h.MessagesListView(w, r)
+		return
+	}
 
-	h.Messages(w, r)
+	h.MessagesListView(w, r)
 }

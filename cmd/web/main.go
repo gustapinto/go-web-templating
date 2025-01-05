@@ -8,10 +8,15 @@ import (
 	"net/http"
 
 	"github.com/gustapinto/go-web-templating/cmd/web/handlers"
+	"github.com/gustapinto/go-web-templating/internal/message"
+	message_repository "github.com/gustapinto/go-web-templating/internal/message/repository"
 )
 
 //go:embed all:views
 var viewsFS embed.FS
+
+//go:embed all:assets
+var assetsFS embed.FS
 
 func main() {
 	patterns := []string{
@@ -24,10 +29,13 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+	mux.Handle("GET /assets/", http.FileServerFS(assetsFS))
 
-	index := handlers.Index{Views: views}
-	mux.HandleFunc("GET /", index.Messages)
-	mux.HandleFunc("POST /", index.MessagesForm)
+	messageService := message.NewMessage(message_repository.NewInMemory())
+	messageHandler := handlers.NewMessage(views, messageService)
+
+	mux.HandleFunc("GET /{$}", messageHandler.MessagesListView)
+	mux.HandleFunc("POST /{$}", messageHandler.MessagesForm)
 
 	listener, err := net.Listen("tcp", ":9000")
 	if err != nil {
